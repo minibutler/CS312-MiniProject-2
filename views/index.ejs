@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joke App</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Get a Personalized Joke</h1>
+        
+        <form action="/getjoke" method="GET">
+            <label for="name">Enter your name:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="category">Select Joke Category:</label>
+            <select id="category" name="category" required>
+                <option value="Any">Any</option>
+                <option value="Programming">Programming</option>
+                <option value="Miscellaneous">Miscellaneous</option>
+                <option value="Pun">Pun</option>
+            </select>
+
+            <label for="jokeType">Choose Joke Type:</label>
+            <select id="jokeType" name="jokeType" required>
+                <option value="single">Single (One-liner)</option>
+                <option value="twopart">Two-part (Setup + Delivery)</option>
+            </select>
+
+            <label for="filter">Filter Explicit Content:</label>
+            <select id="filter" name="filter" required>
+                <option value="safe">Yes (Family-friendly)</option>
+                <option value="explicit">No (Include explicit jokes)</option>
+            </select>
+
+            <button type="submit">Get Joke</button>
+        </form>
+
+        <% if (joke) { %>
+            <div class="joke">
+                <!-- Check if userName is defined, and handle the case if it's not -->
+                <h3><%= typeof userName !== 'undefined' && userName ? userName + "'s Joke" : "Your Joke" %>:</h3>
+                <p><%= joke %></p>
+            </div>
+        <% } %>
+
+        <% if (error) { %>
+            <div class="error">
+                <p><%= error %></p>
+            </div>
+        <% } %>
+    </div>
+</body>
+</html>
