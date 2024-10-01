@@ -6,51 +6,55 @@ const PORT = 3000;
 // Set EJS as the template engine
 app.set('view engine', 'ejs');
 
-// Static folder for serving CSS and other static files
+// Static folder for CSS
 app.use(express.static('public'));
 
-// Home route: Display the form for joke input
+// Home route to render the joke form
 app.get('/', (req, res) => {
     res.render('index', { joke: null, userName: null, error: null });
 });
 
+// Route to get the joke based on user input
 app.get('/getjoke', (req, res) => {
-    const userName = req.query.name;
-    const category = req.query.category;
-    const jokeType = req.query.jokeType === "twopart" ? "twopart" : "single";
+    const userName = req.query.name; 
+    const category = req.query.category; 
+    const jokeType = req.query.jokeType === "twopart" ? "twopart" : "single";  // Handle joke type
     
-    // Use "explicit" as the blacklist flag to filter explicit content
     const blacklistFlag = req.query.filter === "safe" ? "explicit" : "";
 
     // Create the API URL based on user inputs
-    const apiUrl = `https://v2.jokeapi.dev/joke/${category}?type=${jokeType}&blacklistFlags=${blacklistFlag}&name=${userName}`;
+    let apiUrl = `https://v2.jokeapi.dev/joke/${category}?type=${jokeType}`;
+    
+    // Append blacklist flag if filtering is applied
+    if (blacklistFlag) {
+        apiUrl += `&blacklistFlags=${blacklistFlag}`;
+    }
 
     // Make an API request to JokeAPI
     axios.get(apiUrl)
         .then(response => {
-
             const jokeData = response.data;
 
-            // Initialize the joke variable
+            // Check if it's a single-part or two-part joke
             let joke = "";
             if (jokeData.type === "single") {
-                joke = jokeData.joke;  // For single part joke
+                joke = jokeData.joke;
             } else if (jokeData.type === "twopart") {
-                joke = `${jokeData.setup} - ${jokeData.delivery}`;  // For two-part joke
+                joke = `${jokeData.setup} - ${jokeData.delivery}`;
             }
 
-            // Render the joke and user's name to the EJS template
+            // Render joke and userName to the EJS template
             res.render('index', { joke: joke, userName: userName, error: null });
         })
         .catch(error => {
+            console.error('Error fetching joke:', error);
 
-            // Render the error to the user
+            // Pass userName and error to the template in case of failure
             res.render('index', { joke: null, userName: userName, error: 'Error fetching joke, please try again!' });
         });
 });
 
-
-// Start the server on port 3000
+// Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
